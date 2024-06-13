@@ -1,0 +1,61 @@
+#include <Arduino.h>
+
+// Define the pins for the ultrasonic sensor
+const int trigPin = 12;
+const int echoPin = 14;
+
+// Define the pins for the LEDs
+const int redLedPin = 27;
+const int greenLedPin = 26;
+
+// Define the distance threshold for flood detection (in centimeters)
+const int floodThreshold = 10;
+
+void setup() {
+  // Initialize the serial communication
+  Serial.begin(115200);
+
+  // Set the ultrasonic sensor pins as input/output
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+
+  // Set the LED pins as output
+  pinMode(redLedPin, OUTPUT);
+  pinMode(greenLedPin, OUTPUT);
+}
+
+void loop() {
+  // Send a short pulse to the ultrasonic sensor
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  // Measure the duration of the echo pulse
+  long duration = pulseIn(echoPin, HIGH);
+
+  // Calculate the distance in centimeters
+  int distance = duration * 0.034 / 2;
+
+  // Print the distance to the serial monitor
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  // Check if the distance is below the flood threshold
+  if (distance < floodThreshold) {
+    // Turn on the red LED to indicate flood
+    digitalWrite(redLedPin, HIGH);
+    digitalWrite(greenLedPin, LOW);
+    Serial.println("Flood detected!");
+  } else {
+    // Turn on the green LED to indicate normal condition
+    digitalWrite(redLedPin, LOW);
+    digitalWrite(greenLedPin, HIGH);
+    Serial.println("Normal condition.");
+  }
+
+  // Delay before the next reading
+  delay(1000);
+}
